@@ -1,0 +1,359 @@
+
+@model IEnumerable<FoodLoop.Models.Food>
+
+@{
+    ViewData["Title"] = "Food Donations";
+    var foods = Model ?? Enumerable.Empty<FoodLoop.Models.Food>();
+}
+
+<style>
+    .donation-header {
+        background: linear-gradient(120deg, #075638, #159957);
+        color: white;
+        padding: 35px;
+        border-radius: 20px;
+        margin: 25px 0;
+    }
+
+    .stat-card, .food-panel {
+        background: white;
+        border: 1px solid #e5eee8;
+        border-radius: 18px;
+        padding: 22px;
+        height: 100%;
+        box-shadow: 0 5px 20px #12351a08;
+    }
+
+    .stat-number {
+        font-size: 30px;
+        font-weight: 800;
+        color: #087f4b;
+    }
+
+    .food-card {
+        border: 1px solid #e5eee8;
+        border-radius: 18px;
+        padding: 22px;
+        height: 100%;
+        background: white;
+        transition: .2s;
+        box-shadow: 0 5px 15px #12351a08;
+    }
+
+    .food-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 25px #07563812;
+    }
+
+    .food-emoji {
+        background: #eaf7ef;
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 30px;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-available {
+        color: #087443;
+        background: #d9f7e4;
+    }
+
+    .status-reserved {
+        color: #925b00;
+        background: #fff0c2;
+    }
+
+    .status-donated {
+        color: #1557a6;
+        background: #dcecff;
+    }
+
+    .status-claimed {
+        color: #6b35a5;
+        background: #efe2ff;
+    }
+
+    .food-location {
+        color: #65766b;
+        overflow-wrap: anywhere;
+    }
+
+    .empty-state {
+        background: #f4faf6;
+        border-radius: 15px;
+        padding: 45px 15px;
+        text-align: center;
+    }
+
+    .food-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .food-actions > * {
+        flex: 1 1 100px;
+    }
+
+    .food-actions form {
+        margin: 0;
+    }
+
+    .food-actions button {
+        width: 100%;
+    }
+</style>
+
+<div class="container mb-5">
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3">
+            @TempData["Message"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-3">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Page Header -->
+    <section class="donation-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <p class="mb-2">🌱 FOODLOOP COMMUNITY</p>
+                <h1 class="fw-bold">Food Donations</h1>
+                <p class="mb-0">
+                    Share food, spread kindness and reduce waste.
+                </p>
+            </div>
+
+            <a asp-controller="Foods"
+               asp-action="Create"
+               class="btn btn-light text-success fw-bold px-4 py-3">
+                + Donate Food
+            </a>
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div style="font-size:28px">🍱</div>
+                <div class="text-muted mt-2">Total Donations</div>
+                <div class="stat-number">@foods.Count()</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div style="font-size:28px">✅</div>
+                <div class="text-muted mt-2">Available Donations</div>
+                <div class="stat-number">
+                    @foods.Count(f => f.Status == "Available")
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="text-muted mt-2">Available Meals</div>
+<div class="stat-number">
+    @(foods.Where(f => f.Status == "Available").Sum(f => f.Quantity))
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <section class="food-panel mb-4">
+        <h4 class="fw-bold mb-3">🔎 Find Food Donations</h4>
+
+        <form asp-controller="Foods" asp-action="Index" method="get">
+            <div class="row g-3">
+                <div class="col-md-7">
+                    <input type="text"
+                           name="searchString"
+                           value="@Context.Request.Query["searchString"]"
+                           class="form-control"
+                           placeholder="Search food name or location..." />
+                </div>
+
+                <div class="col-md-3">
+                    <select name="statusFilter" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Available"
+                                selected="@(Context.Request.Query["statusFilter"] == "Available")">
+                            Available
+                        </option>
+                        <option value="Claimed"
+                                selected="@(Context.Request.Query["statusFilter"] == "Claimed")">
+                            Claimed
+                        </option>
+                        <option value="Reserved"
+                                selected="@(Context.Request.Query["statusFilter"] == "Reserved")">
+                            Reserved
+                        </option>
+                        <option value="Donated"
+                                selected="@(Context.Request.Query["statusFilter"] == "Donated")">
+                            Donated
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-success">
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            <a asp-controller="Foods"
+               asp-action="Index"
+               class="btn btn-sm btn-outline-secondary mt-3">
+                Clear Filters
+            </a>
+        </form>
+    </section>
+
+    <!-- Food Listings -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold mb-0">Community Food Listings</h3>
+        <span class="text-muted">@foods.Count() donation(s)</span>
+    </div>
+
+    @if (foods.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var food in foods)
+            {
+                var statusClass = food.Status switch
+                {
+                    "Reserved" => "status-reserved",
+                    "Donated" => "status-donated",
+                    "Claimed" => "status-claimed",
+                    _ => "status-available"
+                };
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="food-card">
+
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="food-emoji">🥗</div>
+
+                            <span class="status-pill @statusClass">
+                                @food.Status
+                            </span>
+                        </div>
+
+                        <h4 class="fw-bold">@food.FoodName</h4>
+
+                        <p class="food-location mb-2">
+                            📍 @food.Location
+                        </p>
+
+                        <div class="border-top pt-3 mt-3">
+                            <small class="text-muted">Quantity</small>
+                            <div class="fw-bold">
+                                🍽️ @food.Quantity meals
+                            </div>
+                        </div>
+
+                        <div class="food-actions">
+
+                            <a asp-controller="Foods"
+                               asp-action="Details"
+                               asp-route-id="@food.Id"
+                               class="btn btn-outline-primary">
+                                View Details
+                            </a>
+
+                            @if (food.Status == "Available")
+                            {
+                                <form asp-controller="Foods"
+                                      asp-action="Claim"
+                                      method="post">
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@food.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-success">
+                                        Claim Food
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        disabled>
+                                    Already Claimed
+                                </button>
+                            }
+
+                            <a asp-controller="Foods"
+                               asp-action="Edit"
+                               asp-route-id="@food.Id"
+                               class="btn btn-outline-success">
+                                ✏️ Edit
+                            </a>
+
+                            <a asp-controller="Foods"
+                               asp-action="Delete"
+                               asp-route-id="@food.Id"
+                               class="btn btn-outline-danger">
+                                🗑️ Delete
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state mt-3">
+            <div style="font-size:48px">🍃</div>
+            <h4 class="fw-bold mt-3">No donations found</h4>
+            <p class="text-muted">
+                Try another search or add a new food donation.
+            </p>
+
+            <a asp-controller="Foods"
+               asp-action="Create"
+               class="btn btn-success">
+                + Donate Food
+            </a>
+        </div>
+    }
+
+    <a asp-controller="Home"
+       asp-action="Index"
+       class="btn btn-outline-success mt-4">
+        ← Back to Home
+    </a>
+
+</div>

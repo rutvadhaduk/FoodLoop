@@ -1,0 +1,130 @@
+
+:root {
+    --green: #087f4b;
+    --dark-green: #075638;
+    --light-green: #eaf7ef;
+    --text: #243b32;
+}
+
+body {
+    background: #f7faf8;
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.navbar {
+    background: white !important;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+    padding: 14px 0;
+}
+
+.navbar-brand {
+    color: var(--green) !important;
+    font-size: 25px;
+    font-weight: 750;
+}
+
+.nav-link {
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--green) !important;
+}
+
+.btn-success {
+    background: var(--green);
+    border-color: var(--green);
+    border-radius: 9px;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    background: var(--dark-green);
+    border-color: var(--dark-green);
+    transform: translateY(-1px);
+}
+
+.btn-primary,
+.btn-danger,
+.btn-secondary,
+.btn-outline-success {
+    border-radius: 8px;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.card {
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.card-header {
+    border-bottom: none;
+}
+
+.form-control,
+.form-select {
+    padding: 12px;
+    border: 1px solid #dce8df;
+    border-radius: 9px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(8, 127, 75, 0.12);
+}
+
+.table {
+    background: white;
+    border-color: #e5eee8;
+}
+
+.table thead th {
+    background: var(--light-green);
+    color: var(--dark-green);
+    padding: 15px;
+}
+
+.table tbody td {
+    padding: 14px;
+}
+
+.table-hover tbody tr:hover {
+    background: #f1faf4;
+}
+
+.text-success {
+    color: var(--green) !important;
+}
+
+footer {
+    background: white;
+    border-top: 1px solid #e5eee8;
+    margin-top: 50px;
+    padding: 20px 0;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    h2 {
+        font-size: 25px;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+}
